@@ -4,29 +4,27 @@ let config = {};
 
 config.point_num = 1000;
 config.radius = 2000;
-
-let width = window.innerWidth;
-let viz_width = width;
-let height = window.innerHeight;
-
-let fov = 40;
-let near = 10;
-let far = 7000;
+config.width = window.innerWidth;
+config.viz_width = config.width;
+config.height = window.innerHeight;
+config.fov = 40;
+config.near = 10;
+config.far = 7000;
 
 // Set up camera and scene
 let camera = new THREE.PerspectiveCamera(
-  fov,
-  width / height,
-  near,
-  far 
+  config.fov,
+  config.width / config.height,
+  config.near,
+  config.far 
 );
 
 window.addEventListener('resize', () => {
-  width = window.innerWidth;
-  viz_width = width;
-  height = window.innerHeight;
-  renderer.setSize(width, height);
-  camera.aspect = width / height;
+  config.width = window.innerWidth;
+  config.viz_width = config.width;
+  config.height = window.innerHeight;
+  renderer.setSize(config.width, config.height);
+  camera.aspect = config.width / config.height;
   camera.updateProjectionMatrix();
 })
 
@@ -45,19 +43,19 @@ let color_array = [
 
 // Add canvas
 let renderer = new THREE.WebGLRenderer();
-renderer.setSize(width, height);
+renderer.setSize(config.width, config.height);
 document.body.appendChild(renderer.domElement);
 
 let zoom = d3.zoom()
-	.scaleExtent([getScaleFromZ(far, fov, height), getScaleFromZ(near, fov, height)])
+	.scaleExtent([getScaleFromZ(config.far, config.fov, config.height), getScaleFromZ(config.near, config.fov, config.height)])
 	.on('zoom', () =>  {
 		let d3_transform = d3.event.transform;
-		zoomHandler(camera, d3_transform, viz_width, height);
+		zoomHandler(camera, d3_transform, config.viz_width, config.height);
 	});
 
 view = d3.select(renderer.domElement);
 
-setUpZoom(view, camera, viz_width, height);
+setUpZoom(view, camera, config.viz_width, config.height);
 
 circle_sprite= new THREE.TextureLoader().load(
   "https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png"
@@ -116,7 +114,7 @@ raycaster.params.Points.threshold = 10;
 view.on("mousemove", () => {
 	let [mouseX, mouseY] = d3.mouse(view.node());
 	let mouse_position = [mouseX, mouseY];
-	checkIntersects(mouse_position, viz_width, height, camera, points, generated_points);
+	checkIntersects(mouse_position, config.viz_width, config.height, camera, points, generated_points);
 });
 
 
