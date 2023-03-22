@@ -55,10 +55,10 @@ function randomPosition(radius)
 }
 
 
-function gen_circle_random(radius)
+function gen_circle_random(radius, n)
 {
 	let data_points = [];
-	for (let i = 0; i < point_num; i++)
+	for (let i = 0; i < n; i++)
 	{
 		let position = randomPosition(radius);
 		let name = 'Point ' + i;
@@ -78,6 +78,28 @@ function mouseToThree(mouse, viz_width, height)
 	-(mouse[1] / height) * 2 + 1,
 	1
 	);
+}
+
+
+function checkIntersects(mouse_position, viz_width, height, camera, points, generated_points)
+{
+	let mouse_vector = mouseToThree(mouse_position, viz_width, height);
+	raycaster.setFromCamera(mouse_vector, camera);
+	let intersects = raycaster.intersectObject(points);
+	if (intersects[0])
+	{
+		let sorted_intersects = sortIntersectsByDistanceToRay(intersects);
+		let intersect = sorted_intersects[0];
+		let index = intersect.index;
+		let datum = generated_points[index];
+		highlightPoint(datum);
+		showTooltip(mouse_position, datum);
+	}
+	else
+	{
+		removeHighlights();
+		hideTooltip();
+	}
 }
 
 

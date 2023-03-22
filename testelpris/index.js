@@ -1,6 +1,9 @@
 // This is a companion pen to go along with https://beta.observablehq.com/@grantcuster/using-three-js-for-2d-data-visualization. It shows a three.js pan and zoom example using d3-zoom working on 100,000 points. The code isn't very organized here so I recommend you check out the notebook to read about what is going on.
 
-let point_num = 1000;
+let config = {};
+
+config.point_num = 1000;
+config.radius = 2000;
 
 let width = window.innerWidth;
 let viz_width = width;
@@ -22,7 +25,6 @@ window.addEventListener('resize', () => {
   width = window.innerWidth;
   viz_width = width;
   height = window.innerHeight;
-
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
@@ -61,13 +63,13 @@ circle_sprite= new THREE.TextureLoader().load(
   "https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png"
 )
 
-let radius = 2000;
 
 
 
 
 
-let generated_points = gen_circle_random(radius);
+
+let generated_points = gen_circle_random(config.radius, config.point_num);
 
 let pointsGeometry = new THREE.Geometry();
 
@@ -114,27 +116,12 @@ raycaster.params.Points.threshold = 10;
 view.on("mousemove", () => {
 	let [mouseX, mouseY] = d3.mouse(view.node());
 	let mouse_position = [mouseX, mouseY];
-	checkIntersects(mouse_position);
+	checkIntersects(mouse_position, viz_width, height, camera, points, generated_points);
 });
 
 
 
-function checkIntersects(mouse_position) {
-  let mouse_vector = mouseToThree(mouse_position, viz_width, height);
-  raycaster.setFromCamera(mouse_vector, camera);
-  let intersects = raycaster.intersectObject(points);
-  if (intersects[0]) {
-    let sorted_intersects = sortIntersectsByDistanceToRay(intersects);
-    let intersect = sorted_intersects[0];
-    let index = intersect.index;
-    let datum = generated_points[index];
-    highlightPoint(datum);
-    showTooltip(mouse_position, datum);
-  } else {
-    removeHighlights();
-    hideTooltip();
-  }
-}
+
 
 function sortIntersectsByDistanceToRay(intersects) {
   return _.sortBy(intersects, "distanceToRay");
