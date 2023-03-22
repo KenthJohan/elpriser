@@ -57,39 +57,14 @@ view = d3.select(renderer.domElement);
 
 setUpZoom(view, camera, config.viz_width, config.height);
 
-circle_sprite= new THREE.TextureLoader().load(
-  "https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png"
-)
-
-
+circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png");
 
 
 
 
 
 let generated_points = gen_circle_random(config.radius, config.point_num);
-
-let pointsGeometry = new THREE.Geometry();
-
-let colors = [];
-for (let datum of generated_points) {
-  // Set vector coordinates from data
-  let vertex = new THREE.Vector3(datum.position[0], datum.position[1], 0);
-  pointsGeometry.vertices.push(vertex);
-  let color = new THREE.Color(color_array[datum.group]);
-  colors.push(color);
-}
-pointsGeometry.colors = colors;
-
-let pointsMaterial = new THREE.PointsMaterial({
-  size: 8,
-  sizeAttenuation: false,
-  vertexColors: THREE.VertexColors,
-  map: circle_sprite,
-  transparent: true
-});
-
-let points = new THREE.Points(pointsGeometry, pointsMaterial);
+let points = gen_THREE_Points(generated_points);
 
 let scene = new THREE.Scene();
 scene.add(points);
