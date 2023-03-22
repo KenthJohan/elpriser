@@ -47,7 +47,7 @@ renderer.setSize(width, height);
 document.body.appendChild(renderer.domElement);
 
 let zoom = d3.zoom()
-	.scaleExtent([getScaleFromZ(far), getScaleFromZ(near)])
+	.scaleExtent([getScaleFromZ(far, fov, height), getScaleFromZ(near, fov, height)])
 	.on('zoom', () =>  {
 		let d3_transform = d3.event.transform;
 		zoomHandler(camera, d3_transform, viz_width, height);
@@ -104,20 +104,7 @@ animate();
 
 
 
-function getScaleFromZ (camera_z_position)
-{
-  let half_fov = fov/2;
-  let half_fov_radians = toRadians(half_fov);
-  let half_fov_height = Math.tan(half_fov_radians) * camera_z_position;
-  let fov_height = half_fov_height * 2;
-  let scale = height / fov_height; // Divide visualization height by height derived from field of view
-  return scale;
-}
 
-
-function toRadians (angle) {
-  return angle * (Math.PI / 180);
-}
 
 // Hover and tooltip interaction
 

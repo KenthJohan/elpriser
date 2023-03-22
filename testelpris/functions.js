@@ -1,3 +1,19 @@
+function toRadians (angle)
+{
+	return angle * (Math.PI / 180);
+}
+
+function getScaleFromZ(camera_z_position, fov, height)
+{
+	let half_fov = fov/2;
+	let half_fov_radians = toRadians(half_fov);
+	let half_fov_height = Math.tan(half_fov_radians) * camera_z_position;
+	let fov_height = half_fov_height * 2;
+	let scale = height / fov_height; // Divide visualization height by height derived from field of view
+	return scale;
+}
+
+
 function getZFromScale(fov, scale, height)
 {
 	let half_fov = fov/2;
@@ -21,7 +37,7 @@ function zoomHandler(camera, d3_transform, viz_width, height)
 function setUpZoom(view, camera, viz_width, height)
 {
 	view.call(zoom);    
-	let initial_scale = getScaleFromZ(far);
+	let initial_scale = getScaleFromZ(far, camera.fov, height);
 	var initial_transform = d3.zoomIdentity.translate(viz_width/2, height/2).scale(initial_scale);    
 	zoom.transform(view, initial_transform);
 	camera.position.set(0, 0, far);
@@ -54,15 +70,6 @@ function gen_circle_random(radius)
 }
 
 
-function getScaleFromZ(fov, camera_z_position, height)
-{
-	let half_fov = fov/2;
-	let half_fov_radians = toRadians(half_fov);
-	let half_fov_height = Math.tan(half_fov_radians) * camera_z_position;
-	let fov_height = half_fov_height * 2;
-	let scale = height / fov_height; // Divide visualization height by height derived from field of view
-	return scale;
-}
 
 
 
