@@ -1,6 +1,44 @@
-fetch("https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE3.json")
-  .then((response) => response.json())
-  .then((data) => console.log(data));
+function elpris_to_points(data)
+{
+	let data_points = [];
+	for (let i = 0; i < n; i++)
+	{
+		let position = [i, data[i].SEK_per_kWh];
+		let name = 'Point ' + i;
+		let group = Math.floor(Math.random() * 6);
+		let point = { position, name, group };
+		data_points.push(point);
+	}
+	return data_points;
+}
+
+
+function load_price(scene)
+{
+	fetch("https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE3.json")
+	.then((response) => response.json())
+	.then((data) => {
+		console.log(data);
+		let p = elpris_to_points(data);
+	});
+}
+
+
+
+
+function gen_circle_random(radius, n)
+{
+	let data_points = [];
+	for (let i = 0; i < n; i++)
+	{
+		let position = randomPosition(radius);
+		let name = 'Point ' + i;
+		let group = Math.floor(Math.random() * 6);
+		let point = { position, name, group };
+		data_points.push(point);
+	}
+	return data_points;
+}
 
 
 function gen_THREE_Points(generated_points)

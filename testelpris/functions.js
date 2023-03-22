@@ -55,19 +55,7 @@ function randomPosition(radius)
 }
 
 
-function gen_circle_random(radius, n)
-{
-	let data_points = [];
-	for (let i = 0; i < n; i++)
-	{
-		let position = randomPosition(radius);
-		let name = 'Point ' + i;
-		let group = Math.floor(Math.random() * 6);
-		let point = { position, name, group };
-		data_points.push(point);
-	}
-	return data_points;
-}
+
 
 
 

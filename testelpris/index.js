@@ -11,6 +11,10 @@ config.fov = 40;
 config.near = 10;
 config.far = 7000;
 
+config.scene = new THREE.Scene();
+
+
+
 // Set up camera and scene
 let camera = new THREE.PerspectiveCamera(
   config.fov,
@@ -19,13 +23,15 @@ let camera = new THREE.PerspectiveCamera(
   config.far 
 );
 
+console.log(camera);
+
 window.addEventListener('resize', () => {
-  config.width = window.innerWidth;
-  config.viz_width = config.width;
-  config.height = window.innerHeight;
-  renderer.setSize(config.width, config.height);
-  camera.aspect = config.width / config.height;
-  camera.updateProjectionMatrix();
+	config.width = window.innerWidth;
+	config.viz_width = config.width;
+	config.height = window.innerHeight;
+	renderer.setSize(config.width, config.height);
+	camera.aspect = config.width / config.height;
+	camera.updateProjectionMatrix();
 })
 
 let color_array = [
@@ -63,17 +69,17 @@ circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.i
 
 
 
-let generated_points = gen_circle_random(config.radius, config.point_num);
-let points = gen_THREE_Points(generated_points);
+config.generated_points = gen_circle_random(config.radius, config.point_num);
+config.points = gen_THREE_Points(config.generated_points);
 
-let scene = new THREE.Scene();
-scene.add(points);
-scene.background = new THREE.Color(0xefefef);
+
+config.scene.add(config.points);
+config.scene.background = new THREE.Color(0xefefef);
 
 // Three.js render loop
 function animate() {
   requestAnimationFrame(animate);
-  renderer.render(scene, camera);
+  renderer.render(config.scene, camera);
 }
 animate();
 
@@ -87,9 +93,8 @@ raycaster = new THREE.Raycaster();
 raycaster.params.Points.threshold = 10;
 
 view.on("mousemove", () => {
-	let [mouseX, mouseY] = d3.mouse(view.node());
-	let mouse_position = [mouseX, mouseY];
-	checkIntersects(mouse_position, config.viz_width, config.height, camera, points, generated_points);
+	let m = d3.mouse(view.node());
+	checkIntersects(m, config.viz_width, config.height, camera, config.points, config.generated_points);
 });
 
 
@@ -101,7 +106,7 @@ function sortIntersectsByDistanceToRay(intersects) {
 }
 
 hoverContainer = new THREE.Object3D()
-scene.add(hoverContainer);
+config.scene.add(hoverContainer);
 
 function highlightPoint(datum) {
   removeHighlights();
