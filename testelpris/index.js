@@ -70,10 +70,13 @@ circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.i
 
 
 config.generated_points = gen_circle_random(config.radius, config.point_num);
-config.points = gen_THREE_Points(config.generated_points);
 
 
-config.scene.add(config.points);
+//config.points = gen_THREE_Points(config.generated_points);
+//config.scene.add(config.points);
+
+load_price(config);
+
 config.scene.background = new THREE.Color(0xefefef);
 
 // Three.js render loop
@@ -94,6 +97,7 @@ raycaster.params.Points.threshold = 10;
 
 view.on("mousemove", () => {
 	let m = d3.mouse(view.node());
+	if(!config.points){return;}
 	checkIntersects(m, config.viz_width, config.height, camera, config.points, config.generated_points);
 });
 

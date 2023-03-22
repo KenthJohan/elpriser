@@ -1,10 +1,10 @@
 function elpris_to_points(data)
 {
 	let data_points = [];
-	for (let i = 0; i < n; i++)
+	for (let i = 0; i < data.length; i++)
 	{
 		let position = [i, data[i].SEK_per_kWh];
-		let name = 'Point ' + i;
+		let name = 'SEK_per_kWh ' + data[i].SEK_per_kWh;
 		let group = Math.floor(Math.random() * 6);
 		let point = { position, name, group };
 		data_points.push(point);
@@ -13,13 +13,15 @@ function elpris_to_points(data)
 }
 
 
-function load_price(scene)
+function load_price(config)
 {
 	fetch("https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE3.json")
 	.then((response) => response.json())
 	.then((data) => {
 		console.log(data);
-		let p = elpris_to_points(data);
+		config.generated_points = elpris_to_points(data);
+		config.points = gen_THREE_Points(config.generated_points);
+		config.scene.add(config.points);
 	});
 }
 
