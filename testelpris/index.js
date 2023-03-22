@@ -112,21 +112,15 @@ raycaster = new THREE.Raycaster();
 raycaster.params.Points.threshold = 10;
 
 view.on("mousemove", () => {
-  let [mouseX, mouseY] = d3.mouse(view.node());
-  let mouse_position = [mouseX, mouseY];
-checkIntersects(mouse_position);
+	let [mouseX, mouseY] = d3.mouse(view.node());
+	let mouse_position = [mouseX, mouseY];
+	checkIntersects(mouse_position);
 });
 
-function mouseToThree(mouseX, mouseY) {
-  return new THREE.Vector3(
-    mouseX / viz_width * 2 - 1,
-    -(mouseY / height) * 2 + 1,
-    1
-  );
-}
+
 
 function checkIntersects(mouse_position) {
-  let mouse_vector = mouseToThree(...mouse_position);
+  let mouse_vector = mouseToThree(mouse_position, viz_width, height);
   raycaster.setFromCamera(mouse_vector, camera);
   let intersects = raycaster.intersectObject(points);
   if (intersects[0]) {

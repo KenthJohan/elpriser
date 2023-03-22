@@ -71,6 +71,14 @@ function gen_circle_random(radius)
 
 
 
+function mouseToThree(mouse, viz_width, height)
+{
+	return new THREE.Vector3(
+	mouse[0] / viz_width * 2 - 1,
+	-(mouse[1] / height) * 2 + 1,
+	1
+	);
+}
 
 
 
