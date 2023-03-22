@@ -104,7 +104,8 @@ animate();
 
 
 
-function getScaleFromZ (camera_z_position) {
+function getScaleFromZ (camera_z_position)
+{
   let half_fov = fov/2;
   let half_fov_radians = toRadians(half_fov);
   let half_fov_height = Math.tan(half_fov_radians) * camera_z_position;
@@ -113,13 +114,6 @@ function getScaleFromZ (camera_z_position) {
   return scale;
 }
 
-function getZFromScale(scale) {
-  let half_fov = fov/2;
-  let half_fov_radians = toRadians(half_fov);
-  let scale_height = height / scale;
-  let camera_z_position = scale_height / (2 * Math.tan(half_fov_radians));
-  return camera_z_position;
-}
 
 function toRadians (angle) {
   return angle * (Math.PI / 180);
