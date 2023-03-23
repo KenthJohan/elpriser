@@ -23,45 +23,47 @@ let color_array = [
 function app_init(cfg)
 {
 	let app = {};
+	app.width = cfg.width;
+	app.height = cfg.height;
+	app.fov = cfg.fov;
+	app.near = cfg.near;
+	app.far = cfg.far;
 	app.scene = new THREE.Scene();
 	app.scene.background = new THREE.Color(0xefefef);
 	
 	app.camera = new THREE.PerspectiveCamera(
-		cfg.fov,
-		cfg.width / cfg.height,
-		cfg.near,
-		cfg.far 
+		app.fov,
+		app.width / app.height,
+		app.near,
+		app.far 
 	);
 	console.log(app.camera);
 	
 	app.raycaster = new THREE.Raycaster();
-	app.raycaster.params.Points.threshold = 10
-	
-	window.addEventListener('resize', () => {
-		cfg.width = window.innerWidth;
-		cfg.viz_width = cfg.width;
-		cfg.height = window.innerHeight;
-		renderer.setSize(cfg.width, cfg.height);
-		cfg.camera.aspect = cfg.width / cfg.height;
-		cfg.camera.updateProjectionMatrix();
-	});
-	
+	app.raycaster.params.Points.threshold = 10;
 
 	app.renderer = new THREE.WebGLRenderer();
-	app.renderer.setSize(cfg.width, cfg.height);
+	app.renderer.setSize(app.width, app.height);
 	document.body.appendChild(app.renderer.domElement);
 	
+	window.addEventListener('resize', () => {
+		app.width = window.innerWidth;
+		app.height = window.innerHeight;
+		app.renderer.setSize(app.width, app.height);
+		app.camera.aspect = app.width / app.height;
+		app.camera.updateProjectionMatrix();
+	});
 	
 	let zoom = d3.zoom()
-		.scaleExtent([getScaleFromZ(cfg.far, cfg.fov, cfg.height), getScaleFromZ(cfg.near, cfg.fov, cfg.height)])
+		.scaleExtent([getScaleFromZ(app.far, app.fov, app.height), getScaleFromZ(app.near, app.fov, app.height)])
 		.on('zoom', () =>  {
 			let d3_transform = d3.event.transform;
-			zoomHandler(app.camera, d3_transform, cfg.viz_width, cfg.height);
+			zoomHandler(app.camera, d3_transform, app.width, app.height);
 		});
 
 	view = d3.select(app.renderer.domElement);
 
-	setUpZoom(view, zoom, app.camera, cfg.viz_width, cfg.height);
+	setUpZoom(view, zoom, app.camera, app.width, app.height);
 
 	
 	
@@ -78,7 +80,7 @@ function app_init(cfg)
 	view.on("mousemove", () => {
 		let m = d3.mouse(view.node());
 		if(!app.points){return;}
-		let mouse_vector = mouseToThree(m, cfg.viz_width, cfg.height);
+		let mouse_vector = mouseToThree(m, app.width, app.height);
 		app.raycaster.setFromCamera(mouse_vector, app.camera);
 		let intersects = app.raycaster.intersectObject(app.points);
 		if (intersects[0])
