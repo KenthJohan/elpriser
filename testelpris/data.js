@@ -13,19 +13,19 @@ function elpris_to_points(data)
 }
 
 
-function load_price(config)
+function load_price(app)
 {
 	fetch("https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE3.json")
 	.then((response) => response.json())
 	.then((data) => {
 		console.log(data);
-		config.generated_points = elpris_to_points(data);
-		config.points = gen_THREE_Points(config.generated_points);
-		config.scene.add(config.points);
+		app.generated_points = elpris_to_points(data);
+		app.points = gen_THREE_Points(app.generated_points);
+		app.scene.add(app.points);
 	});
 }
 
-
+let circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png");
 function gen_THREE_Points(generated_points)
 {
 	let pointsGeometry = new THREE.Geometry();

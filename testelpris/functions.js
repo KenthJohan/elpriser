@@ -34,7 +34,7 @@ function zoomHandler(camera, d3_transform, viz_width, height)
 	camera.position.set(x, y, z);
 }
 
-function setUpZoom(view, camera, viz_width, height)
+function setUpZoom(view, zoom, camera, viz_width, height)
 {
 	view.call(zoom);    
 	let initial_scale = getScaleFromZ(camera.far, camera.fov, height);

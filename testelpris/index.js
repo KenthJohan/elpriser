@@ -1,37 +1,8 @@
 // This is a companion pen to go along with https://beta.observablehq.com/@grantcuster/using-three-js-for-2d-data-visualization. It shows a three.js pan and zoom example using d3-zoom working on 100,000 points. The code isn't very organized here so I recommend you check out the notebook to read about what is going on.
 
-let config = {};
-config.width = window.innerWidth;
-config.viz_width = config.width;
-config.height = window.innerHeight;
-config.fov = 40;
-config.near = 10;
-config.far = 7000;
-
-config.scene = new THREE.Scene();
-config.scene.background = new THREE.Color(0xefefef);
-
-config.camera = new THREE.PerspectiveCamera(
-  config.fov,
-  config.width / config.height,
-  config.near,
-  config.far 
-);
-
-config.raycaster = new THREE.Raycaster();
-config.raycaster.params.Points.threshold = 10;
 
 
-console.log(config.camera);
 
-window.addEventListener('resize', () => {
-	config.width = window.innerWidth;
-	config.viz_width = config.width;
-	config.height = window.innerHeight;
-	renderer.setSize(config.width, config.height);
-	config.camera.aspect = config.width / config.height;
-	config.camera.updateProjectionMatrix();
-})
 
 let color_array = [
   "#1f78b4",
@@ -46,48 +17,97 @@ let color_array = [
   "#ffff99"
 ]
 
-// Add canvas
-let renderer = new THREE.WebGLRenderer();
-renderer.setSize(config.width, config.height);
-document.body.appendChild(renderer.domElement);
-
-let zoom = d3.zoom()
-	.scaleExtent([getScaleFromZ(config.far, config.fov, config.height), getScaleFromZ(config.near, config.fov, config.height)])
-	.on('zoom', () =>  {
-		let d3_transform = d3.event.transform;
-		zoomHandler(config.camera, d3_transform, config.viz_width, config.height);
-	});
-
-view = d3.select(renderer.domElement);
-
-setUpZoom(view, config.camera, config.viz_width, config.height);
-
-circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png");
 
 
 
-load_price(config);
-
-
-
-// Three.js render loop
-function animate()
+function app_init(cfg)
 {
-	requestAnimationFrame(animate);
-	renderer.render(config.scene, config.camera);
+	let app = {};
+	app.scene = new THREE.Scene();
+	app.scene.background = new THREE.Color(0xefefef);
+	
+	app.camera = new THREE.PerspectiveCamera(
+		cfg.fov,
+		cfg.width / cfg.height,
+		cfg.near,
+		cfg.far 
+	);
+	console.log(app.camera);
+	
+	app.raycaster = new THREE.Raycaster();
+	app.raycaster.params.Points.threshold = 10
+	
+	window.addEventListener('resize', () => {
+		cfg.width = window.innerWidth;
+		cfg.viz_width = cfg.width;
+		cfg.height = window.innerHeight;
+		renderer.setSize(cfg.width, cfg.height);
+		cfg.camera.aspect = cfg.width / cfg.height;
+		cfg.camera.updateProjectionMatrix();
+	});
+	
+
+	app.renderer = new THREE.WebGLRenderer();
+	app.renderer.setSize(cfg.width, cfg.height);
+	document.body.appendChild(app.renderer.domElement);
+	
+	
+	let zoom = d3.zoom()
+		.scaleExtent([getScaleFromZ(cfg.far, cfg.fov, cfg.height), getScaleFromZ(cfg.near, cfg.fov, cfg.height)])
+		.on('zoom', () =>  {
+			let d3_transform = d3.event.transform;
+			zoomHandler(app.camera, d3_transform, cfg.viz_width, cfg.height);
+		});
+
+	view = d3.select(app.renderer.domElement);
+
+	setUpZoom(view, zoom, app.camera, cfg.viz_width, cfg.height);
+
+	
+	
+	// Three.js render loop
+	function animate()
+	{
+		requestAnimationFrame(animate);
+		app.renderer.render(app.scene, app.camera);
+	}
+	animate();
+
+
+	// Hover and tooltip interaction
+	view.on("mousemove", () => {
+		let m = d3.mouse(view.node());
+		if(!app.points){return;}
+		checkIntersects(app.raycaster, m, config.viz_width, config.height, app.camera, app.points, app.generated_points);
+	});
+	
+	return app;
 }
-animate();
 
 
 
 
 
-// Hover and tooltip interaction
-view.on("mousemove", () => {
-	let m = d3.mouse(view.node());
-	if(!config.points){return;}
-	checkIntersects(config.raycaster, m, config.viz_width, config.height, config.camera, config.points, config.generated_points);
-});
+
+
+
+
+
+
+let config = {};
+config.width = window.innerWidth;
+config.viz_width = config.width;
+config.height = window.innerHeight;
+config.fov = 40;
+config.near = 10;
+config.far = 7000;
+
+let app1 = app_init(config);
+load_price(app1);
+
+
+
+
 
 
 
@@ -98,7 +118,7 @@ function sortIntersectsByDistanceToRay(intersects) {
 }
 
 hoverContainer = new THREE.Object3D()
-config.scene.add(hoverContainer);
+app1.scene.add(hoverContainer);
 
 function highlightPoint(datum)
 {
