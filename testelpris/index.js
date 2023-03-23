@@ -78,7 +78,24 @@ function app_init(cfg)
 	view.on("mousemove", () => {
 		let m = d3.mouse(view.node());
 		if(!app.points){return;}
-		checkIntersects(app.raycaster, m, config.viz_width, config.height, app.camera, app.points, app.generated_points);
+		let mouse_vector = mouseToThree(m, cfg.viz_width, cfg.height);
+		app.raycaster.setFromCamera(mouse_vector, app.camera);
+		let intersects = app.raycaster.intersectObject(app.points);
+		if (intersects[0])
+		{
+			let sorted_intersects = sortIntersectsByDistanceToRay(intersects);
+			let intersect = sorted_intersects[0];
+			let index = intersect.index;
+			let datum = app.generated_points[index];
+			highlightPoint(datum);
+			showTooltip(m, datum);
+		}
+		else
+		{
+			removeHighlights();
+			hideTooltip();
+		}
+		
 	});
 	
 	return app;
@@ -107,15 +124,6 @@ load_price(app1);
 
 
 
-
-
-
-
-
-
-function sortIntersectsByDistanceToRay(intersects) {
-  return _.sortBy(intersects, "distanceToRay");
-}
 
 hoverContainer = new THREE.Object3D()
 app1.scene.add(hoverContainer);

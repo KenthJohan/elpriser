@@ -54,25 +54,9 @@ function mouseToThree(mouse, viz_width, height)
 }
 
 
-function checkIntersects(raycaster, mouse_position, viz_width, height, camera, points, generated_points)
+function sortIntersectsByDistanceToRay(intersects)
 {
-	let mouse_vector = mouseToThree(mouse_position, viz_width, height);
-	raycaster.setFromCamera(mouse_vector, camera);
-	let intersects = raycaster.intersectObject(points);
-	if (intersects[0])
-	{
-		let sorted_intersects = sortIntersectsByDistanceToRay(intersects);
-		let intersect = sorted_intersects[0];
-		let index = intersect.index;
-		let datum = generated_points[index];
-		highlightPoint(datum);
-		showTooltip(mouse_position, datum);
-	}
-	else
-	{
-		removeHighlights();
-		hideTooltip();
-	}
+	return _.sortBy(intersects, "distanceToRay");
 }
 
 
