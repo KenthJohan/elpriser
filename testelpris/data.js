@@ -13,20 +13,58 @@ function elpris_to_points(data)
 }
 
 
+async function async_fetch_json(urlv)
+{
+	let fv = [];
+	for(u of urlv)
+	{
+		fv.push(fetch(u));
+	}
+    const rv = await Promise.all(fv);
+	let dv = [];
+	for(r of rv)
+	{
+		dv.push(await r.json());
+	}
+	return dv;
+}
+
+
 function load_price(app)
 {
+    const urlv = 
+	[
+		"https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE2.json",
+		"https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE3.json"
+	];
+	
+	async_fetch_json(urlv).then((values) =>
+	{
+		console.log(values);
+		
+		app.generated_points = elpris_to_points(values[0]);
+		app.points = gen_THREE_Points(app.generated_points, app.color_array, app.pointsMaterial);
+		console.log(app.points);
+		app.scene.add(app.points);
+	});
+	
+	/*
 	fetch("https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE3.json")
 	.then((response) => response.json())
 	.then((data) => {
 		console.log(data);
-		app.generated_points = elpris_to_points(data);
-		app.points = gen_THREE_Points(app.generated_points, app.color_array);
-		app.scene.add(app.points);
 	});
+	*/
+	
+
 }
 
-let circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png");
-function gen_THREE_Points(generated_points, color_array)
+
+
+
+
+
+function gen_THREE_Points(generated_points, color_array, pointsMaterial)
 {
 	let pointsGeometry = new THREE.Geometry();
 	let colors = [];
@@ -39,13 +77,6 @@ function gen_THREE_Points(generated_points, color_array)
 		colors.push(color);
 	}
 	pointsGeometry.colors = colors;
-	let pointsMaterial = new THREE.PointsMaterial({
-		size: 8,
-		sizeAttenuation: false,
-		vertexColors: THREE.VertexColors,
-		map: circle_sprite,
-		transparent: true
-	});
 	let points = new THREE.Points(pointsGeometry, pointsMaterial);
 	return points;
 }

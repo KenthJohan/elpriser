@@ -31,7 +31,15 @@ function app_init(cfg)
 		"#cab2d6",
 		"#ffff99"
 	];
-
+	app.circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png");
+	app.pointsMaterial = new THREE.PointsMaterial({
+		size: 8,
+		sizeAttenuation: false,
+		vertexColors: THREE.VertexColors,
+		map: app.circle_sprite,
+		transparent: true
+	});
+	
 	app.tooltip_state = { display: "none" }
 	app.tooltip_template = document.createRange().createContextualFragment(`<div id="tooltip" style="display: none; position: absolute; pointer-events: none; font-size: 13px; width: 120px; text-align: center; line-height: 1; padding: 6px; background: white; font-family: sans-serif;">
 	  <div id="point_tip" style="padding: 4px; margin-bottom: 4px;"></div>
@@ -128,7 +136,7 @@ function app_init(cfg)
 			size: 26,
 			sizeAttenuation: false,
 			vertexColors: THREE.VertexColors,
-			map: circle_sprite,
+			map: app.circle_sprite,
 			transparent: true
 		});
 		let point = new THREE.Points(geometry, material);
