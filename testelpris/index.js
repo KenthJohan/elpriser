@@ -115,7 +115,6 @@ function app_init(cfg)
 
 let config = {};
 config.width = window.innerWidth;
-config.viz_width = config.width;
 config.height = window.innerHeight;
 config.fov = 40;
 config.near = 10;

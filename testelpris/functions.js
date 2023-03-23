@@ -25,29 +25,29 @@ function getZFromScale(fov, scale, height)
 
 
 
-function zoomHandler(camera, d3_transform, viz_width, height)
+function zoomHandler(camera, d3_transform, width, height)
 {
 	let scale = d3_transform.k;
-	let x = -(d3_transform.x - viz_width/2) / scale;
+	let x = -(d3_transform.x - width/2) / scale;
 	let y = (d3_transform.y - height/2) / scale;
 	let z = getZFromScale(camera.fov, scale, height);
 	camera.position.set(x, y, z);
 }
 
-function setUpZoom(view, zoom, camera, viz_width, height)
+function setUpZoom(view, zoom, camera, width, height)
 {
 	view.call(zoom);    
 	let initial_scale = getScaleFromZ(camera.far, camera.fov, height);
-	var initial_transform = d3.zoomIdentity.translate(viz_width/2, height/2).scale(initial_scale);    
+	var initial_transform = d3.zoomIdentity.translate(width/2, height/2).scale(initial_scale);    
 	zoom.transform(view, initial_transform);
 	camera.position.set(0, 0, camera.far);
 }
 
 
-function mouseToThree(mouse, viz_width, height)
+function mouseToThree(mouse, width, height)
 {
 	return new THREE.Vector3(
-	mouse[0] / viz_width * 2 - 1,
+	mouse[0] / width * 2 - 1,
 	-(mouse[1] / height) * 2 + 1,
 	1
 	);
