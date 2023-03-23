@@ -26,23 +26,6 @@ function load_price(config)
 }
 
 
-
-
-function gen_circle_random(radius, n)
-{
-	let data_points = [];
-	for (let i = 0; i < n; i++)
-	{
-		let position = randomPosition(radius);
-		let name = 'Point ' + i;
-		let group = Math.floor(Math.random() * 6);
-		let point = { position, name, group };
-		data_points.push(point);
-	}
-	return data_points;
-}
-
-
 function gen_THREE_Points(generated_points)
 {
 	let pointsGeometry = new THREE.Geometry();

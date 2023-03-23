@@ -44,21 +44,6 @@ function setUpZoom(view, camera, viz_width, height)
 }
 
 
-// Random point in circle code from https://stackoverflow.com/questions/32642399/simplest-way-to-plot-points-randomly-inside-a-circle
-function randomPosition(radius)
-{
-	var pt_angle = Math.random() * 2 * Math.PI;
-	var pt_radius_sq = Math.random() * radius * radius;
-	var pt_x = Math.sqrt(pt_radius_sq) * Math.cos(pt_angle);
-	var pt_y = Math.sqrt(pt_radius_sq) * Math.sin(pt_angle);
-	return [pt_x, pt_y];
-}
-
-
-
-
-
-
 function mouseToThree(mouse, viz_width, height)
 {
 	return new THREE.Vector3(
@@ -69,7 +54,7 @@ function mouseToThree(mouse, viz_width, height)
 }
 
 
-function checkIntersects(mouse_position, viz_width, height, camera, points, generated_points)
+function checkIntersects(raycaster, mouse_position, viz_width, height, camera, points, generated_points)
 {
 	let mouse_vector = mouseToThree(mouse_position, viz_width, height);
 	raycaster.setFromCamera(mouse_vector, camera);

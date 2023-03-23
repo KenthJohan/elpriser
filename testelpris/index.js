@@ -1,9 +1,6 @@
 // This is a companion pen to go along with https://beta.observablehq.com/@grantcuster/using-three-js-for-2d-data-visualization. It shows a three.js pan and zoom example using d3-zoom working on 100,000 points. The code isn't very organized here so I recommend you check out the notebook to read about what is going on.
 
 let config = {};
-
-config.point_num = 1000;
-config.radius = 2000;
 config.width = window.innerWidth;
 config.viz_width = config.width;
 config.height = window.innerHeight;
@@ -12,26 +9,28 @@ config.near = 10;
 config.far = 7000;
 
 config.scene = new THREE.Scene();
+config.scene.background = new THREE.Color(0xefefef);
 
-
-
-// Set up camera and scene
-let camera = new THREE.PerspectiveCamera(
+config.camera = new THREE.PerspectiveCamera(
   config.fov,
   config.width / config.height,
   config.near,
   config.far 
 );
 
-console.log(camera);
+config.raycaster = new THREE.Raycaster();
+config.raycaster.params.Points.threshold = 10;
+
+
+console.log(config.camera);
 
 window.addEventListener('resize', () => {
 	config.width = window.innerWidth;
 	config.viz_width = config.width;
 	config.height = window.innerHeight;
 	renderer.setSize(config.width, config.height);
-	camera.aspect = config.width / config.height;
-	camera.updateProjectionMatrix();
+	config.camera.aspect = config.width / config.height;
+	config.camera.updateProjectionMatrix();
 })
 
 let color_array = [
@@ -56,33 +55,26 @@ let zoom = d3.zoom()
 	.scaleExtent([getScaleFromZ(config.far, config.fov, config.height), getScaleFromZ(config.near, config.fov, config.height)])
 	.on('zoom', () =>  {
 		let d3_transform = d3.event.transform;
-		zoomHandler(camera, d3_transform, config.viz_width, config.height);
+		zoomHandler(config.camera, d3_transform, config.viz_width, config.height);
 	});
 
 view = d3.select(renderer.domElement);
 
-setUpZoom(view, camera, config.viz_width, config.height);
+setUpZoom(view, config.camera, config.viz_width, config.height);
 
 circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png");
 
 
 
-
-
-config.generated_points = gen_circle_random(config.radius, config.point_num);
-
-
-//config.points = gen_THREE_Points(config.generated_points);
-//config.scene.add(config.points);
-
 load_price(config);
 
-config.scene.background = new THREE.Color(0xefefef);
+
 
 // Three.js render loop
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(config.scene, camera);
+function animate()
+{
+	requestAnimationFrame(animate);
+	renderer.render(config.scene, config.camera);
 }
 animate();
 
@@ -91,14 +83,10 @@ animate();
 
 
 // Hover and tooltip interaction
-
-raycaster = new THREE.Raycaster();
-raycaster.params.Points.threshold = 10;
-
 view.on("mousemove", () => {
 	let m = d3.mouse(view.node());
 	if(!config.points){return;}
-	checkIntersects(m, config.viz_width, config.height, camera, config.points, config.generated_points);
+	checkIntersects(config.raycaster, m, config.viz_width, config.height, config.camera, config.points, config.generated_points);
 });
 
 
@@ -112,7 +100,8 @@ function sortIntersectsByDistanceToRay(intersects) {
 hoverContainer = new THREE.Object3D()
 config.scene.add(hoverContainer);
 
-function highlightPoint(datum) {
+function highlightPoint(datum)
+{
   removeHighlights();
   
   let geometry = new THREE.Geometry();
