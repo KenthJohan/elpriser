@@ -1,16 +1,35 @@
-function elpris_to_points(data)
+function elpris_to_points(data, group)
 {
 	let data_points = [];
 	for (let i = 0; i < data.length; i++)
 	{
 		let position = [i, data[i].SEK_per_kWh];
 		let name = 'SEK_per_kWh ' + data[i].SEK_per_kWh;
-		let group = Math.floor(Math.random() * 6);
 		let point = { position, name, group };
 		data_points.push(point);
 	}
 	return data_points;
 }
+
+
+function elpriser_to_points(v)
+{
+	let p = [];
+	for (let i in v)
+	{
+		console.log(i);
+		p.push(...elpris_to_points(v[i], i));
+	}
+	return p;
+}
+
+
+
+
+
+
+
+
 
 
 async function async_fetch_json(urlv)
@@ -30,19 +49,25 @@ async function async_fetch_json(urlv)
 }
 
 
+
+
+
 function load_price(app)
 {
     const urlv = 
 	[
-		"https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE2.json",
+		"https://www.elprisetjustnu.se/api/v1/prices/2023/03-21_SE3.json",
 		"https://www.elprisetjustnu.se/api/v1/prices/2023/03-22_SE3.json"
 	];
+	
+	
+	
 	
 	async_fetch_json(urlv).then((values) =>
 	{
 		console.log(values);
 		
-		app.generated_points = elpris_to_points(values[0]);
+		app.generated_points = elpriser_to_points(values);
 		app.points = gen_THREE_Points(app.generated_points, app.color_array, app.pointsMaterial);
 		console.log(app.points);
 		app.scene.add(app.points);
