@@ -5,10 +5,7 @@ function toRadians (angle)
 
 function getScaleFromZ(camera_z_position, fov, height)
 {
-	let half_fov = fov/2;
-	let half_fov_radians = toRadians(half_fov);
-	let half_fov_height = Math.tan(half_fov_radians) * camera_z_position;
-	let fov_height = half_fov_height * 2;
+	let fov_height = Math.tan(toRadians(fov/2)) * camera_z_position * 2;
 	let scale = height / fov_height; // Divide visualization height by height derived from field of view
 	return scale;
 }
@@ -16,10 +13,8 @@ function getScaleFromZ(camera_z_position, fov, height)
 
 function getZFromScale(fov, scale, height)
 {
-	let half_fov = fov/2;
-	let half_fov_radians = toRadians(half_fov);
 	let scale_height = height / scale;
-	let camera_z_position = scale_height / (2 * Math.tan(half_fov_radians));
+	let camera_z_position = scale_height / (2 * Math.tan(toRadians(fov/2)));
 	return camera_z_position;
 }
 
@@ -46,11 +41,9 @@ function setUpZoom(view, zoom, camera, width, height)
 
 function mouseToThree(mouse, width, height)
 {
-	return new THREE.Vector3(
-	mouse[0] / width * 2 - 1,
-	-(mouse[1] / height) * 2 + 1,
-	1
-	);
+	let x = (mouse[0] / width) * 2 - 1;
+	let y = -(mouse[1] / height) * 2 + 1;
+	return new THREE.Vector3(x, y, 1);
 }
 
 
