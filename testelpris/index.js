@@ -4,18 +4,7 @@
 
 
 
-let color_array = [
-  "#1f78b4",
-  "#b2df8a",
-  "#33a02c",
-  "#fb9a99",
-  "#e31a1c",
-  "#fdbf6f",
-  "#ff7f00",
-  "#6a3d9a",
-  "#cab2d6",
-  "#ffff99"
-]
+
 
 
 
@@ -30,6 +19,29 @@ function app_init(cfg)
 	app.far = cfg.far;
 	app.scene = new THREE.Scene();
 	app.scene.background = new THREE.Color(0xefefef);
+	app.color_array = [
+		"#1f78b4",
+		"#b2df8a",
+		"#33a02c",
+		"#fb9a99",
+		"#e31a1c",
+		"#fdbf6f",
+		"#ff7f00",
+		"#6a3d9a",
+		"#cab2d6",
+		"#ffff99"
+	];
+
+	app.tooltip_state = { display: "none" }
+	app.tooltip_template = document.createRange().createContextualFragment(`<div id="tooltip" style="display: none; position: absolute; pointer-events: none; font-size: 13px; width: 120px; text-align: center; line-height: 1; padding: 6px; background: white; font-family: sans-serif;">
+	  <div id="point_tip" style="padding: 4px; margin-bottom: 4px;"></div>
+	  <div id="group_tip" style="padding: 4px;"></div>
+	</div>`);
+	document.body.append(app.tooltip_template);
+	app.$tooltip = document.querySelector('#tooltip');
+	app.$point_tip = document.querySelector('#point_tip');
+	app.$group_tip = document.querySelector('#group_tip');
+	
 	
 	app.camera = new THREE.PerspectiveCamera(
 		app.fov,
@@ -45,7 +57,11 @@ function app_init(cfg)
 	app.renderer = new THREE.WebGLRenderer();
 	app.renderer.setSize(app.width, app.height);
 	document.body.appendChild(app.renderer.domElement);
-	
+
+	app.hoverContainer = new THREE.Object3D()
+	app.scene.add(app.hoverContainer);
+
+
 	window.addEventListener('resize', () => {
 		app.width = window.innerWidth;
 		app.height = window.innerHeight;
@@ -65,7 +81,34 @@ function app_init(cfg)
 
 	setUpZoom(view, zoom, app.camera, app.width, app.height);
 
-	
+	function updateTooltip()
+	{
+		app.$tooltip.style.display = app.tooltip_state.display;
+		app.$tooltip.style.left = app.tooltip_state.left + 'px';
+		app.$tooltip.style.top = app.tooltip_state.top + 'px';
+		app.$point_tip.innerText = app.tooltip_state.name;
+		app.$point_tip.style.background = app.color_array[app.tooltip_state.group];
+		app.$group_tip.innerText = `Group ${app.tooltip_state.group}`;
+	}
+
+	function showTooltip(mouse_position, datum)
+	{
+		let tooltip_width = 120;
+		let x_offset = -tooltip_width/2;
+		let y_offset = 30;
+		app.tooltip_state.display = "block";
+		app.tooltip_state.left = mouse_position[0] + x_offset;
+		app.tooltip_state.top = mouse_position[1] + y_offset;
+		app.tooltip_state.name = datum.name;
+		app.tooltip_state.group = datum.group;
+		updateTooltip();
+	}
+
+	function hideTooltip()
+	{
+		app.tooltip_state.display = "none";
+		updateTooltip();
+	}
 	
 	// Three.js render loop
 	function animate()
@@ -75,6 +118,22 @@ function app_init(cfg)
 	}
 	animate();
 
+	function highlightPoint(datum)
+	{
+		removeHighlights();
+		let geometry = new THREE.Geometry();
+		geometry.vertices.push(new THREE.Vector3(datum.position[0],datum.position[1],0));
+		geometry.colors = [ new THREE.Color(app.color_array[datum.group]) ];
+		let material = new THREE.PointsMaterial({
+			size: 26,
+			sizeAttenuation: false,
+			vertexColors: THREE.VertexColors,
+			map: circle_sprite,
+			transparent: true
+		});
+		let point = new THREE.Points(geometry, material);
+		app.hoverContainer.add(point);
+	}
 
 	// Hover and tooltip interaction
 	view.on("mousemove", () => {
@@ -97,7 +156,15 @@ function app_init(cfg)
 			removeHighlights();
 			hideTooltip();
 		}
-		
+	});
+	
+	function removeHighlights()
+	{
+		app.hoverContainer.remove(...app.hoverContainer.children);
+	}
+
+	view.on("mouseleave", () => {
+		removeHighlights()
 	});
 	
 	return app;
@@ -120,85 +187,23 @@ config.fov = 40;
 config.near = 10;
 config.far = 7000;
 
+
+
+
+
 let app1 = app_init(config);
 load_price(app1);
 
 
 
 
-hoverContainer = new THREE.Object3D()
-app1.scene.add(hoverContainer);
 
-function highlightPoint(datum)
-{
-  removeHighlights();
-  
-  let geometry = new THREE.Geometry();
-  geometry.vertices.push(
-    new THREE.Vector3(
-      datum.position[0],
-      datum.position[1],
-      0
-    )
-  );
-  geometry.colors = [ new THREE.Color(color_array[datum.group]) ];
 
-  let material = new THREE.PointsMaterial({
-    size: 26,
-    sizeAttenuation: false,
-    vertexColors: THREE.VertexColors,
-    map: circle_sprite,
-    transparent: true
-  });
-  
-  let point = new THREE.Points(geometry, material);
-  hoverContainer.add(point);
-}
 
-function removeHighlights() {
-  hoverContainer.remove(...hoverContainer.children);
-}
 
-view.on("mouseleave", () => {
-  removeHighlights()
-});
 
-// Initial tooltip state
-let tooltip_state = { display: "none" }
 
-let tooltip_template = document.createRange().createContextualFragment(`<div id="tooltip" style="display: none; position: absolute; pointer-events: none; font-size: 13px; width: 120px; text-align: center; line-height: 1; padding: 6px; background: white; font-family: sans-serif;">
-  <div id="point_tip" style="padding: 4px; margin-bottom: 4px;"></div>
-  <div id="group_tip" style="padding: 4px;"></div>
-</div>`);
-document.body.append(tooltip_template);
 
-let $tooltip = document.querySelector('#tooltip');
-let $point_tip = document.querySelector('#point_tip');
-let $group_tip = document.querySelector('#group_tip');
 
-function updateTooltip() {
-  $tooltip.style.display = tooltip_state.display;
-  $tooltip.style.left = tooltip_state.left + 'px';
-  $tooltip.style.top = tooltip_state.top + 'px';
-  $point_tip.innerText = tooltip_state.name;
-  $point_tip.style.background = color_array[tooltip_state.group];
-  $group_tip.innerText = `Group ${tooltip_state.group}`;
-}
 
-function showTooltip(mouse_position, datum) {
-  let tooltip_width = 120;
-  let x_offset = -tooltip_width/2;
-  let y_offset = 30;
-  tooltip_state.display = "block";
-  tooltip_state.left = mouse_position[0] + x_offset;
-  tooltip_state.top = mouse_position[1] + y_offset;
-  tooltip_state.name = datum.name;
-  tooltip_state.group = datum.group;
-  updateTooltip();
-}
-
-function hideTooltip() {
-  tooltip_state.display = "none";
-  updateTooltip();
-}
 

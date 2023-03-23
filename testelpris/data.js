@@ -20,13 +20,13 @@ function load_price(app)
 	.then((data) => {
 		console.log(data);
 		app.generated_points = elpris_to_points(data);
-		app.points = gen_THREE_Points(app.generated_points);
+		app.points = gen_THREE_Points(app.generated_points, app.color_array);
 		app.scene.add(app.points);
 	});
 }
 
 let circle_sprite = new THREE.TextureLoader().load("https://fastforwardlabs.github.io/visualization_assets/circle-sprite.png");
-function gen_THREE_Points(generated_points)
+function gen_THREE_Points(generated_points, color_array)
 {
 	let pointsGeometry = new THREE.Geometry();
 	let colors = [];
