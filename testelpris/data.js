@@ -3,8 +3,8 @@ function elpris_to_points(data, group)
 	let data_points = [];
 	for (let i = 0; i < data.length; i++)
 	{
-		let position = [i, data[i].SEK_per_kWh];
-		let name = 'SEK_per_kWh ' + data[i].SEK_per_kWh;
+		let position = [i*100, data[i].SEK_per_kWh*100];
+		let name = 'ÖRE_per_kWh ' + data[i].SEK_per_kWh*100;
 		let point = { position, name, group };
 		data_points.push(point);
 	}
@@ -68,9 +68,14 @@ function load_price(app)
 		console.log(values);
 		
 		app.generated_points = elpriser_to_points(values);
-		app.points = gen_THREE_Points(app.generated_points, app.color_array, app.pointsMaterial);
+		
+		let g = gen_THREE_Points(app.generated_points, app.color_array);
+		app.points = new THREE.Points(g, app.pointsMaterial);
+		app.lines = new THREE.Line(g, app.linesMaterial);
+		
 		console.log(app.points);
 		app.scene.add(app.points);
+		app.scene.add(app.lines);
 	});
 	
 	/*
@@ -89,7 +94,7 @@ function load_price(app)
 
 
 
-function gen_THREE_Points(generated_points, color_array, pointsMaterial)
+function gen_THREE_Points(generated_points, color_array)
 {
 	let pointsGeometry = new THREE.Geometry();
 	let colors = [];
@@ -102,7 +107,8 @@ function gen_THREE_Points(generated_points, color_array, pointsMaterial)
 		colors.push(color);
 	}
 	pointsGeometry.colors = colors;
-	let points = new THREE.Points(pointsGeometry, pointsMaterial);
-	return points;
+	return pointsGeometry;
+	
+
 }
 

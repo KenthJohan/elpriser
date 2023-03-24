@@ -39,6 +39,7 @@ function app_init(cfg)
 		map: app.circle_sprite,
 		transparent: true
 	});
+	app.linesMaterial = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 	
 	app.tooltip_state = { display: "none" }
 	app.tooltip_template = document.createRange().createContextualFragment(`<div id="tooltip" style="display: none; position: absolute; pointer-events: none; font-size: 13px; width: 120px; text-align: center; line-height: 1; padding: 6px; background: white; font-family: sans-serif;">
