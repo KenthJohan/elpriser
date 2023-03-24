@@ -12,23 +12,6 @@ function elpris_to_points(data, group)
 }
 
 
-function elpriser_to_points(v)
-{
-	let p = [];
-	for (let i in v)
-	{
-		console.log(i);
-		p.push(...elpris_to_points(v[i], i));
-	}
-	return p;
-}
-
-
-
-
-
-
-
 
 
 
@@ -41,9 +24,10 @@ async function async_fetch_json(urlv)
 	}
     const rv = await Promise.all(fv);
 	let dv = [];
-	for(r of rv)
+	for(i in rv)
 	{
-		dv.push(await r.json());
+		let batch = elpris_to_points(await rv[i].json(), i);
+		dv.push(batch);
 	}
 	return dv;
 }
@@ -67,6 +51,26 @@ function load_price(app)
 	{
 		console.log(values);
 		
+		
+		let g0 = gen_THREE_Points(values[0], app.color_array);
+		let g1 = gen_THREE_Points(values[1], app.color_array);
+		
+		let p0 = new THREE.Points(g0, app.pointsMaterial);
+		let p1 = new THREE.Points(g1, app.pointsMaterial);
+		
+		let l0 = new THREE.Line(g0, app.linesMaterial);
+		let l1 = new THREE.Line(g1, app.linesMaterial);
+		
+		app.scene.add(p0);
+		app.scene.add(p1);
+		app.scene.add(l0);
+		app.scene.add(l1);
+		
+		
+		app.generated_points = values[0];
+		app.points = p0;
+		
+		/*
 		app.generated_points = elpriser_to_points(values);
 		
 		let g = gen_THREE_Points(app.generated_points, app.color_array);
@@ -76,6 +80,7 @@ function load_price(app)
 		console.log(app.points);
 		app.scene.add(app.points);
 		app.scene.add(app.lines);
+		*/
 	});
 	
 	/*
